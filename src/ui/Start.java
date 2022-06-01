@@ -160,7 +160,7 @@ public class Start extends Application {
 	private static void addUserInfo(VBox outer) {
 		if (getUser() != null) {
 			HBox userBox = new HBox();
-			Label userLabel = new Label("Welcome " + getUser());
+			Label userLabel = new Label("Welcome " + getUser().getId()  + " as " + getUser().getAuthorization());
 			userLabel.setFont(Font.font("Trajan Pro", FontWeight.BOLD, 18));
 			userBox.getChildren().add(userLabel);
 			userBox.setAlignment(Pos.CENTER);
