@@ -18,13 +18,21 @@ import dataaccess.DataAccessFacade.StorageType;
 public class DataAccessFacade implements DataAccess {
 	
 	enum StorageType {
-		BOOKS, MEMBERS, USERS;
+		BOOKS, MEMBERS, USERS, CHECKOUTS, CHECKOUT_ENTRIES, COPIES, CURRENT;
 	}
 	
 	public static final String OUTPUT_DIR = System.getProperty("user.dir") 
-			+ "\\src\\dataaccess\\storage";
+			+ "/src/dataaccess/storage";
 	public static final String DATE_PATTERN = "MM/dd/yyyy";
-	
+
+	public void setCurrentUser(User user) {
+		saveToStorage(StorageType.CURRENT, user);
+	}
+
+	public User getCurrentUser() {
+		return (User) readFromStorage(StorageType.CURRENT);
+	}
+
 	//implement: other save operations
 	public void saveNewMember(LibraryMember member) {
 		HashMap<String, LibraryMember> mems = readMemberMap();
@@ -32,7 +40,6 @@ public class DataAccessFacade implements DataAccess {
 		mems.put(memberId, member);
 		saveToStorage(StorageType.MEMBERS, mems);	
 	}
-	
 	@SuppressWarnings("unchecked")
 	public  HashMap<String,Book> readBooksMap() {
 		//Returns a Map with name/value pairs being
@@ -55,8 +62,7 @@ public class DataAccessFacade implements DataAccess {
 		//   userId -> User
 		return (HashMap<String, User>)readFromStorage(StorageType.USERS);
 	}
-	
-	
+
 	/////load methods - these place test data into the storage area
 	///// - used just once at startup  
 	

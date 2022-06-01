@@ -47,7 +47,7 @@ public class AllMembersWindow extends Stage implements LibWindow {
 		ta = new TextArea();
 		grid.add(ta, 0,1);	
 		
-		Button backBtn = new Button("<= Back to Main");
+		Button backBtn = new Button("Back to Main");
         backBtn.setOnAction(new EventHandler<ActionEvent>() {
         	@Override
         	public void handle(ActionEvent e) {
