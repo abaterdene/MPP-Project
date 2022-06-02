@@ -120,4 +120,10 @@ public class SystemController implements ControllerInterface {
 			da.saveNewBook(book);
 		}
 	}
+
+	@Override
+	public void checkoutBook(Checkout checkout) {
+		DataAccess da = new DataAccessFacade();
+		da.saveNewCheckout(checkout);
+	}
 }
