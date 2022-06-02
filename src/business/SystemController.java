@@ -1,5 +1,6 @@
 package business;
 
+import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,8 +106,8 @@ public class SystemController implements ControllerInterface {
 	}
 
 	@Override
-	public void checkoutBook(Checkout checkout) {
+	public void checkoutBook(LibraryMember member) {
 		DataAccess da = new DataAccessFacade();
-		da.saveNewCheckout(checkout);
+		da.saveNewMember(member);
 	}
 }

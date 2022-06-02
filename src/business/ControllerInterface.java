@@ -1,5 +1,6 @@
 package business;
 
+import java.lang.reflect.Member;
 import java.util.List;
 
 import business.Book;
@@ -19,5 +20,5 @@ public interface ControllerInterface {
 
 	public Book getRentableBookByIsbn(String isbn) throws LibrarySystemException;
 
-	public void checkoutBook(Checkout checkout);
+	public void checkoutBook(LibraryMember member);
 }

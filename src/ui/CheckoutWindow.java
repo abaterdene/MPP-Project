@@ -21,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -41,13 +42,14 @@ public class CheckoutWindow extends Stage implements LibWindow {
     private TextArea ta;
     private TextArea cart;
 
-    private Book selected;
+    private Book book;
     private LibraryMember member;
-    private CheckoutEntry[] entries = new CheckoutEntry[0];
+//    private CheckoutEntry[] entries = new CheckoutEntry[0];
+    private Checkout checkout = new Checkout( new CheckoutEntry[0]);
 
-    public void setTable(String data, Book book) {
+    public void setTable(String data) {
         ta.setText(data);
-        this.selected = book;
+//        this.selected = book;
     }
 
     public void setCart(String data) {
@@ -90,21 +92,16 @@ public class CheckoutWindow extends Stage implements LibWindow {
         addBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                if (Objects.nonNull(selected)) {
+                if (Objects.nonNull(book)) {
                     try {
-                        BookCopy copy = selected.getNextAvailableCopy();
+                        BookCopy copy = book.getNextAvailableCopy();
                         copy.changeAvailability();
-                        selected.updateCopies(copy);
-
-                        CheckoutEntry[] newArr = new CheckoutEntry[entries.length + 1];
-                        System.arraycopy(entries, 0, newArr, 0, entries.length);
-                        newArr[entries.length] = new CheckoutEntry(copy);
-                        entries = newArr;
-
-                        System.out.println(entries.length);
+                        copy.getBook().updateCopies(copy);
+                        checkout.addEntry(copy);
+                        System.out.println(checkout.getEntries().length);
                         StringBuilder sb = new StringBuilder();
                         sb.append("Title\tCopy Number\n");
-                        for (CheckoutEntry c : entries) {
+                        for (CheckoutEntry c : checkout.getEntries()) {
                             sb.append(c.getBookCopy().getBook().getTitle() +  "\t" + c.getBookCopy().getCopyNum()  +  "\n");
                         }
                         setCart(sb.toString());
@@ -122,12 +119,16 @@ public class CheckoutWindow extends Stage implements LibWindow {
             @Override
             public void handle(ActionEvent e) {
                 try {
-                    System.out.println(entries.length);
-                    Checkout checkout = new Checkout(member, entries);
                     SystemController ci = new SystemController();
-                    ci.checkoutBook(checkout);
-//                        Start.hideAllWindows();
-//                        Start.primStage().show();
+                    for (CheckoutEntry entry : checkout.getEntries()) {
+                        ci.addBook(entry.getBookCopy().getBook());
+                    }
+                    member.addCheckout(checkout);
+                    ci.checkoutBook(member); // save member updated
+                    messageBar.setText("Book is checked out"); // show message
+                    setCart(""); // empty the cart
+//                    Start.hideAllWindows();
+//                    Start.primStage().show();
                 } catch (NullPointerException exception) {
                     messageBar.setText("Book copy is not available");
                 }
@@ -146,13 +147,18 @@ public class CheckoutWindow extends Stage implements LibWindow {
                     SystemController ci = new SystemController();
                     member = ci.getMemberById(fields.get("memberid").getText());
                     messageBar.setText(member.getMemberId() + "\t" + member.getFirstName());
-                    selected = ci.getRentableBookByIsbn(fields.get("isbn").getText());
+                    book = ci.getRentableBookByIsbn(fields.get("isbn").getText());
                     StringBuilder sb = new StringBuilder();
                     sb.append("Title\tAvailable\tCopy Number\n");
-                    for (BookCopy b : selected.getCopies()) {
-                        sb.append(b.getBook().getTitle() +  "\t" + b.getBook().isAvailable()  + "\t"  + b.getCopyNum() + "\n");
-                    }
-                    setTable(sb.toString(), selected);
+//                    for (BookCopy b : book.getCopies()) {
+//                        sb.append(b.getBook().getTitle() +  "\t" + b.getBook().isAvailable()  + "\t"  + b.getCopyNum() + "\n");
+//                    }
+                    Arrays.stream(book.getCopies())
+                            .filter(c -> Boolean.TRUE.equals(c.isAvailable()))
+                            .forEach(b -> {
+                                sb.append(b.getBook().getTitle() +  "\t" + b.getBook().isAvailable()  + "\t"  + b.getCopyNum() + "\n");
+                            });
+                    setTable(sb.toString());
 
                 } catch (LibrarySystemException | InvalidFieldException exception) {
                     messageBar.setText(exception.getMessage());

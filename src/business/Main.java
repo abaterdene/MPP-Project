@@ -32,7 +32,10 @@ public class Main {
 		Collection<LibraryMember> members = da.readMemberMap().values();
 		List<LibraryMember> mems = new ArrayList<>(members);
 		//implement
-		return null;
+		return mems.stream()
+				.filter(m -> m.getCheckouts().length > 0)
+				.map(LibraryMember::getMemberId)
+				.collect(Collectors.toList());
 		
 	}
 	
