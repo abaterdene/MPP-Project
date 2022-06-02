@@ -94,6 +94,7 @@ public class Start extends Application {
         MenuItem memberIds = getMemberIdsItem();
         if (getUser() == null) {
             optionsMenu.getItems().addAll(login);
+            mainMenu.getMenus().addAll(optionsMenu);
         } else {
             if (Auth.LIBRARIAN.equals(getUser().getAuthorization())) {
                 optionsMenu.getItems().addAll(logout, bookIds, memberIds);
@@ -101,16 +102,15 @@ public class Start extends Application {
                 MenuItem memberAdd = getMemberAddItem();
 //				MenuItem bookAdd = getBookAddItem(); // 0.5
                 optionsMenu.getItems().addAll(logout, bookIds, memberIds, memberAdd);
+                mainMenu.getMenus().addAll(optionsMenu);
+
+                Menu checkoutMenu = new Menu("Checkout");
+                checkoutMenu.getItems().add(getCheckoutItem());
+                mainMenu.getMenus().addAll(checkoutMenu);
             }
         }
 
-        mainMenu.getMenus().addAll(optionsMenu);
-        if (Auth.LIBRARIAN.equals(getUser().getAuthorization())) {
-        } else {
-            Menu checkoutMenu = new Menu("Checkout");
-            checkoutMenu.getItems().add(getCheckoutItem());
-            mainMenu.getMenus().addAll(checkoutMenu);
-        }
+
         Scene scene = new Scene(topContainer, 420, 375);
         primaryStage.setScene(scene);
         scene.getStylesheets().add(Start.class.getResource("library.css").toExternalForm());

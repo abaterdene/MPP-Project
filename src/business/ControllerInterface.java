@@ -15,4 +15,6 @@ public interface ControllerInterface {
 
 	public LibraryMember getMemberById(String member) throws LibrarySystemException;
 	public Book getBookByIsbn(String isbn) throws LibrarySystemException;
+
+	public Book getRentableBookByIsbn(String isbn) throws LibrarySystemException;
 }

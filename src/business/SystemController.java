@@ -3,6 +3,7 @@ package business;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import dataaccess.Auth;
 import dataaccess.DataAccess;
@@ -81,6 +82,14 @@ public class SystemController implements ControllerInterface {
 		Book book = da.readBooksMap().get(isbn);
 		if (book != null)
 			return book;
-		throw new LibrarySystemException("Book doesn't exist");
+		throw new LibrarySystemException("Book is not available");
+	}
+
+	@Override
+	public Book getRentableBookByIsbn(String isbn) throws LibrarySystemException {
+		Book book = this.getBookByIsbn(isbn);
+		if (Objects.nonNull(book) && book.getCopies().length > 0)
+			return book;
+		throw new LibrarySystemException("Book is not available");
 	}
 }

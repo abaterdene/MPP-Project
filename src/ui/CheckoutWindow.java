@@ -1,9 +1,6 @@
 package ui;
 
-import business.Book;
-import business.LibraryMember;
-import business.LibrarySystemException;
-import business.SystemController;
+import business.*;
 import fields.InvalidFieldException;
 import fields.TField;
 import fields.ValidationFactory;
@@ -64,9 +61,19 @@ public class CheckoutWindow extends Stage implements LibWindow {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
+        HBox memberBox = new HBox(0);
+        memberBox.setAlignment(Pos.BOTTOM_LEFT);
+        HBox bookBox = new HBox(1);
+        bookBox.setAlignment(Pos.BOTTOM_CENTER);
+        HBox buttonBox = new HBox(2);
+        buttonBox.setAlignment(Pos.BOTTOM_RIGHT);
+
+
         HashMap<String, TextField> fields = new HashMap<>();
-        addField(grid, new TField(), "MemberID", fields);
-        addField(grid, new TField(), "ISBN", fields);
+        addField(memberBox, new TField(), "MemberID", fields);
+        grid.add(memberBox, 0, 1);
+        addField(bookBox, new TField(), "ISBN", fields);
+        grid.add(bookBox, 1, 1);
         Button searchButton = new Button("Search");
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -78,25 +85,30 @@ public class CheckoutWindow extends Stage implements LibWindow {
                             .validate(value.getText()));
                     SystemController ci = new SystemController();
                     LibraryMember member = ci.getMemberById(fields.get("memberid").getText());
-                    Book book = ci.getBookByIsbn(fields.get("isbn").getText());
+                    messageBar.setText(member.getMemberId() + "\t" + member.getFirstName());
+                    Book book = ci.getRentableBookByIsbn(fields.get("isbn").getText());
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Title\tAvailable\tCopy Number\n");
+                    for (BookCopy b : book.getCopies()) {
+                        sb.append(b.getBook().getTitle() +  "\t" + b.getBook().isAvailable()  + "\t"  + b.getCopyNum() + "\n");
+                    }
+                    setData(sb.toString());
                 } catch (LibrarySystemException | InvalidFieldException exception) {
                     messageBar.setText(exception.getMessage());
                 }
             }
         });
-        HBox sButton = new HBox(10);
-//		sButton.setAlignment(Pos.BOTTOM_LEFT);
-        sButton.getChildren().add(searchButton);
-        grid.add(sButton, 3, 2);
+        buttonBox.getChildren().add(searchButton);
+        grid.add(buttonBox, 3, 1);
 
 
         Text scenetitle = new Text("All the book copies");
         scenetitle.setFont(Font.font("Harlow Solid Italic", FontWeight.NORMAL, 20)); //Tahoma
         grid.add(scenetitle, 0, 0, 2, 1);
 
-//		ta = new TextArea();
-//		grid.add(ta, 0,3);
         grid.add(messageBar, 0, 4);
+        ta = new TextArea();
+        grid.add(ta, 0,5);
         Button backBtn = new Button("Back to Main");
         backBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -105,20 +117,28 @@ public class CheckoutWindow extends Stage implements LibWindow {
                 Start.primStage().show();
             }
         });
-        HBox hBack = new HBox(10);
-        hBack.setAlignment(Pos.BOTTOM_LEFT);
-        hBack.getChildren().add(backBtn);
-        grid.add(hBack, 0, 5);
+        Button checkoutBtn = new Button("Checkout");
+        checkoutBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                //
+            }
+        });
+//        HBox hBack = new HBox(10);
+//        hBack.setAlignment(Pos.BOTTOM_LEFT);
+//        hBack.getChildren().add(backBtn);
+        grid.add(backBtn, 0, 6);
+        grid.add(checkoutBtn, 1, 6);
         Scene scene = new Scene(grid);
         scene.getStylesheets().add(getClass().getResource("library.css").toExternalForm());
         setScene(scene);
         isInitialized(true);
     }
 
-    private void addField(GridPane grid, TextField field, String text, HashMap<String, TextField> fields) {
+    private void addField(HBox grid, TextField field, String text, HashMap<String, TextField> fields) {
         Label label = new Label(text + ": ");
-        grid.add(label, fields.size(), 1);
-        grid.add(field, fields.size(), 2);
+        grid.getChildren().add(label);
+        grid.getChildren().add(field);
         fields.put(text.toLowerCase(), field);
     }
 }
