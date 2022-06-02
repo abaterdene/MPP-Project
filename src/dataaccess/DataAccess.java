@@ -2,6 +2,7 @@ package dataaccess;
 
 import java.util.HashMap;
 
+import business.Author;
 import business.Book;
 import business.Checkout;
 import business.LibraryMember;

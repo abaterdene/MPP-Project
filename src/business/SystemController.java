@@ -55,6 +55,14 @@ public class SystemController implements ControllerInterface {
 	}
 
 	@Override
+	public  List<String> allAuthorIds() {
+		DataAccess da = new DataAccessFacade();
+		List<String> retval = new ArrayList<>();
+		retval.addAll(da.readAuthorMap().keySet());
+		return retval;
+	}
+
+	@Override
 	public void addMember(LibraryMember member) {
 		DataAccess da = new DataAccessFacade();
 		if (!currentUser.getAuthorization().equals(Auth.LIBRARIAN))
@@ -92,6 +100,15 @@ public class SystemController implements ControllerInterface {
 		if (Objects.nonNull(book) && book.getCopies().length > 0)
 			return book;
 		throw new LibrarySystemException("Book is not available");
+	}
+
+	@Override
+	public Author getAuthorById(String authorId) throws LibrarySystemException {
+		DataAccess da = new DataAccessFacade();
+		Author author = da.readAuthorMap().get(authorId);
+		if (author != null)
+			return author;
+		throw new LibrarySystemException("Author is not available");
 	}
 
 	@Override

@@ -48,7 +48,8 @@ public class Start extends Application {
             AllBooksWindow.INSTANCE,
             AddMemberWindow.INSTANCE,
             CheckoutWindow.INSTANCE,
-            AddBookCopyWindow.INSTANCE
+            AddBookCopyWindow.INSTANCE,
+            AddBookWindow.INSTANCE
     };
 
     public static void hideAllWindows() {
@@ -101,9 +102,9 @@ public class Start extends Application {
                 optionsMenu.getItems().addAll(logout, bookIds, memberIds);
             } else {
                 MenuItem memberAdd = getMemberAddItem();
-//				MenuItem bookAdd = getBookAddItem(); // 0.5
+				MenuItem bookAdd = getBookAddItem(); // 0.5
                 MenuItem bookCopyAdd = getBookCopyAddItem();
-                optionsMenu.getItems().addAll(logout, bookIds, memberIds, memberAdd, bookCopyAdd);
+                optionsMenu.getItems().addAll(logout, bookIds, memberIds, memberAdd, bookAdd, bookCopyAdd);
                 mainMenu.getMenus().addAll(optionsMenu);
 
                 Menu checkoutMenu = new Menu("Checkout");
@@ -247,19 +248,19 @@ public class Start extends Application {
     }
 
     private static MenuItem getBookAddItem() {
-        MenuItem memberAdd = new MenuItem("Add Member");
-        memberAdd.setOnAction(new EventHandler<ActionEvent>() {
+        MenuItem bookAdd = new MenuItem("Add Book");
+        bookAdd.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 hideAllWindows();
-                if (!AddMemberWindow.INSTANCE.isInitialized()) {
-                    AddMemberWindow.INSTANCE.init();
+                if (!AddBookWindow.INSTANCE.isInitialized()) {
+                    AddBookWindow.INSTANCE.init();
                 }
-                AddMemberWindow.INSTANCE.clear();
-                AddMemberWindow.INSTANCE.show();
+                AddBookWindow.INSTANCE.clear();
+                AddBookWindow.INSTANCE.show();
             }
         });
-        return memberAdd;
+        return bookAdd;
     }
 
     private static MenuItem getBookCopyAddItem() {
