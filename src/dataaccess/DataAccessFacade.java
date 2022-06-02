@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import business.Author;
 import business.Book;
 import business.BookCopy;
 import business.LibraryMember;
@@ -61,8 +63,19 @@ public class DataAccessFacade implements DataAccess {
 		return (HashMap<String, LibraryMember>) readFromStorage(
 				StorageType.MEMBERS);
 	}
-	
-	
+
+	@Override
+	public HashMap<String, Author> readAuthorMap() {
+		HashMap<String, Author> authors = new HashMap<>();
+		for(Book book: readBooksMap().values()) {
+			for(Author author: book.getAuthors()) {
+				authors.put(author.getFirstName() + " " + author.getLastName(), author);
+			}
+		}
+		return authors;
+	}
+
+
 	@SuppressWarnings("unchecked")
 	public HashMap<String, User> readUserMap() {
 		//Returns a Map with name/value pairs being
