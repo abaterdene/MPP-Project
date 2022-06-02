@@ -12,6 +12,8 @@ final public class ValidationFactory {
         map.put("TField", new TValidation());
         map.put("ZipField", new ZipValidation());
         map.put("PhoneField", new PhoneValidation());
+        map.put("IsbnField", new IsbnValidation());
+        map.put("NumberField", new NumberValidation());
     }
 
     public static Validation getValidation(String className) {

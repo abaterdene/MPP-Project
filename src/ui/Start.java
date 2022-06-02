@@ -47,7 +47,8 @@ public class Start extends Application {
             AllMembersWindow.INSTANCE,
             AllBooksWindow.INSTANCE,
             AddMemberWindow.INSTANCE,
-            CheckoutWindow.INSTANCE
+            CheckoutWindow.INSTANCE,
+            AddBookCopyWindow.INSTANCE
     };
 
     public static void hideAllWindows() {
@@ -101,7 +102,8 @@ public class Start extends Application {
             } else {
                 MenuItem memberAdd = getMemberAddItem();
 //				MenuItem bookAdd = getBookAddItem(); // 0.5
-                optionsMenu.getItems().addAll(logout, bookIds, memberIds, memberAdd);
+                MenuItem bookCopyAdd = getBookCopyAddItem();
+                optionsMenu.getItems().addAll(logout, bookIds, memberIds, memberAdd, bookCopyAdd);
                 mainMenu.getMenus().addAll(optionsMenu);
 
                 Menu checkoutMenu = new Menu("Checkout");
@@ -258,5 +260,21 @@ public class Start extends Application {
             }
         });
         return memberAdd;
+    }
+
+    private static MenuItem getBookCopyAddItem() {
+        MenuItem bookCopyAdd = new MenuItem("Add Book Copy");
+        bookCopyAdd.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                hideAllWindows();
+                if (!AddBookCopyWindow.INSTANCE.isInitialized()) {
+                    AddBookCopyWindow.INSTANCE.init();
+                }
+                AddBookCopyWindow.INSTANCE.clear();
+                AddBookCopyWindow.INSTANCE.show();
+            }
+        });
+        return bookCopyAdd;
     }
 }

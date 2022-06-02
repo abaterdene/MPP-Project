@@ -92,4 +92,15 @@ public class SystemController implements ControllerInterface {
 			return book;
 		throw new LibrarySystemException("Book is not available");
 	}
+
+	@Override
+	public void addBookCopy(Book book, int numberOfCopies){
+		DataAccess da = new DataAccessFacade();
+		if (!currentUser.getAuthorization().equals(Auth.LIBRARIAN)) {
+			for (int i = 0; i < numberOfCopies; i++) {
+				book.addCopy();
+			}
+			da.saveNewBook(book);
+		}
+	}
 }
