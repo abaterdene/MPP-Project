@@ -65,4 +65,16 @@ public class SystemController implements ControllerInterface {
 		if (!currentUser.getAuthorization().equals(Auth.LIBRARIAN))
 			da.saveNewBook(book);
 	}
+
+	@Override
+	public LibraryMember getMemberById(String memberId) {
+		DataAccess da = new DataAccessFacade();
+		return da.readMemberMap().get(memberId);
+	}
+
+	@Override
+	public Book getBookByIsbn(String isbn) {
+		DataAccess da = new DataAccessFacade();
+		return da.readBooksMap().get(isbn);
+	}
 }

@@ -46,7 +46,8 @@ public class Start extends Application {
             LoginWindow.INSTANCE,
             AllMembersWindow.INSTANCE,
             AllBooksWindow.INSTANCE,
-            AddMemberWindow.INSTANCE
+            AddMemberWindow.INSTANCE,
+            CheckoutWindow.INSTANCE
     };
 
     public static void hideAllWindows() {
@@ -104,6 +105,12 @@ public class Start extends Application {
         }
 
         mainMenu.getMenus().addAll(optionsMenu);
+        if (Auth.LIBRARIAN.equals(getUser().getAuthorization())) {
+        } else {
+            Menu checkoutMenu = new Menu("Checkout");
+            checkoutMenu.getItems().add(getCheckoutItem());
+            mainMenu.getMenus().addAll(checkoutMenu);
+        }
         Scene scene = new Scene(topContainer, 420, 375);
         primaryStage.setScene(scene);
         scene.getStylesheets().add(Start.class.getResource("library.css").toExternalForm());
@@ -124,6 +131,23 @@ public class Start extends Application {
     private static User getUser() {
         SystemController ci = new SystemController();
         return ci.currentUser;
+    }
+
+    private static MenuItem getCheckoutItem() {
+        MenuItem checkout = new MenuItem("Checkout");
+
+        checkout.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                hideAllWindows();
+                if (!CheckoutWindow.INSTANCE.isInitialized()) {
+                    CheckoutWindow.INSTANCE.init();
+                }
+                CheckoutWindow.INSTANCE.clear();
+                CheckoutWindow.INSTANCE.show();
+            }
+        });
+        return checkout;
     }
 
     private static MenuItem getLoginItem() {
