@@ -4,7 +4,9 @@ import business.Book;
 import business.LibraryMember;
 import business.LibrarySystemException;
 import business.SystemController;
+import fields.InvalidFieldException;
 import fields.TField;
+import fields.ValidationFactory;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -46,6 +48,7 @@ public class CheckoutWindow extends Stage implements LibWindow {
     /* This class is a singleton */
 
     public void clear() {
+        messageBar.setText("");
     }
 
     ;
@@ -69,14 +72,15 @@ public class CheckoutWindow extends Stage implements LibWindow {
             @Override
             public void handle(ActionEvent e) {
                 // search
-                SystemController ci = new SystemController();
-                LibraryMember member = ci.getMemberById(fields.get("memberid").getText());
-                Book book = ci.getBookByIsbn(fields.get("isbn").getText());
-                if (member == null) {
-                    messageBar.setText("Member doesn't exist");
-                }
-                if (book == null) {
-                    messageBar.setText("Book doesn't exist");
+                messageBar.setText("");
+                try {
+                    fields.forEach((key, value) -> ValidationFactory.getValidation(value.getClass().getSimpleName())
+                            .validate(value.getText()));
+                    SystemController ci = new SystemController();
+                    LibraryMember member = ci.getMemberById(fields.get("memberid").getText());
+                    Book book = ci.getBookByIsbn(fields.get("isbn").getText());
+                } catch (LibrarySystemException | InvalidFieldException exception) {
+                    messageBar.setText(exception.getMessage());
                 }
             }
         });

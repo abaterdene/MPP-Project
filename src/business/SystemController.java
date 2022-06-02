@@ -67,14 +67,20 @@ public class SystemController implements ControllerInterface {
 	}
 
 	@Override
-	public LibraryMember getMemberById(String memberId) {
+	public LibraryMember getMemberById(String memberId) throws LibrarySystemException {
 		DataAccess da = new DataAccessFacade();
-		return da.readMemberMap().get(memberId);
+		LibraryMember member = da.readMemberMap().get(memberId);
+		if (member != null)
+			return member;
+		throw new LibrarySystemException("Member doesn't exist");
 	}
 
 	@Override
-	public Book getBookByIsbn(String isbn) {
+	public Book getBookByIsbn(String isbn) throws LibrarySystemException {
 		DataAccess da = new DataAccessFacade();
-		return da.readBooksMap().get(isbn);
+		Book book = da.readBooksMap().get(isbn);
+		if (book != null)
+			return book;
+		throw new LibrarySystemException("Book doesn't exist");
 	}
 }

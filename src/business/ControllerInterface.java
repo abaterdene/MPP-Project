@@ -13,6 +13,6 @@ public interface ControllerInterface {
 	public void addMember(LibraryMember member);
 	public void addBook(Book book);
 
-	public LibraryMember getMemberById(String member);
-	public Book getBookByIsbn(String isbn);
+	public LibraryMember getMemberById(String member) throws LibrarySystemException;
+	public Book getBookByIsbn(String isbn) throws LibrarySystemException;
 }
