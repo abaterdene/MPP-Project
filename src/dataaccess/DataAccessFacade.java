@@ -8,9 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import business.Book;
 import business.BookCopy;
+import business.Checkout;
 import business.LibraryMember;
 import dataaccess.DataAccessFacade.StorageType;
 
@@ -47,11 +49,27 @@ public class DataAccessFacade implements DataAccess {
 		books.put(isbn, book);
 		saveToStorage(StorageType.BOOKS, books);
 	}
+
+	public void saveNewCheckout(Checkout checkout) {
+		HashMap<String, Checkout> checkouts = readCheckoutsMap();
+		String memberId = checkout.getMember().getMemberId();
+		checkouts.put(memberId, checkout);
+		saveToStorage(StorageType.CHECKOUTS, checkouts);
+	}
 	@SuppressWarnings("unchecked")
 	public  HashMap<String,Book> readBooksMap() {
 		//Returns a Map with name/value pairs being
 		//   isbn -> Book
 		return (HashMap<String,Book>) readFromStorage(StorageType.BOOKS);
+	}
+
+	public  HashMap<String,Checkout> readCheckoutsMap() {
+		//Returns a Map with name/value pairs being
+		//   memberId -> Book
+		HashMap<String,Checkout> checkouts = (HashMap<String,Checkout>) readFromStorage(StorageType.CHECKOUTS);
+		if (Objects.isNull(checkouts))
+			checkouts = new HashMap<>();
+		return checkouts;
 	}
 	
 	@SuppressWarnings("unchecked")

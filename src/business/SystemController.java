@@ -56,15 +56,13 @@ public class SystemController implements ControllerInterface {
 	@Override
 	public void addMember(LibraryMember member) {
 		DataAccess da = new DataAccessFacade();
-		if (!currentUser.getAuthorization().equals(Auth.LIBRARIAN))
-			da.saveNewMember(member);
+		da.saveNewMember(member);
 	}
 
 	@Override
 	public void addBook(Book book) {
 		DataAccess da = new DataAccessFacade();
-		if (!currentUser.getAuthorization().equals(Auth.LIBRARIAN))
-			da.saveNewBook(book);
+		da.saveNewBook(book);
 	}
 
 	@Override
@@ -91,5 +89,11 @@ public class SystemController implements ControllerInterface {
 		if (Objects.nonNull(book) && book.getCopies().length > 0)
 			return book;
 		throw new LibrarySystemException("Book is not available");
+	}
+
+	@Override
+	public void checkoutBook(Checkout checkout) {
+		DataAccess da = new DataAccessFacade();
+		da.saveNewCheckout(checkout);
 	}
 }
