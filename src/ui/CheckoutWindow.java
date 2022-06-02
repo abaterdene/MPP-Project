@@ -44,12 +44,10 @@ public class CheckoutWindow extends Stage implements LibWindow {
 
     private Book book;
     private LibraryMember member;
-//    private CheckoutEntry[] entries = new CheckoutEntry[0];
     private Checkout checkout = new Checkout( new CheckoutEntry[0]);
 
     public void setTable(String data) {
         ta.setText(data);
-//        this.selected = book;
     }
 
     public void setCart(String data) {
@@ -60,6 +58,8 @@ public class CheckoutWindow extends Stage implements LibWindow {
 
     public void clear() {
         messageBar.setText("");
+        cart.setText("");
+        this.checkout = new Checkout(new CheckoutEntry[0]);
     }
 
     ;
@@ -88,6 +88,7 @@ public class CheckoutWindow extends Stage implements LibWindow {
         addField(bookBox, new TField(), "ISBN", fields);
         grid.add(bookBox, 1, 1);
 
+        Button searchButton = new Button("Search");
         Button addBtn = new Button("Add book");
         addBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -127,15 +128,15 @@ public class CheckoutWindow extends Stage implements LibWindow {
                     ci.checkoutBook(member); // save member updated
                     messageBar.setText("Book is checked out"); // show message
                     setCart(""); // empty the cart
-//                    Start.hideAllWindows();
-//                    Start.primStage().show();
+                    checkout = new Checkout(new CheckoutEntry[0]);
+                    searchButton.fire();
                 } catch (NullPointerException exception) {
                     messageBar.setText("Book copy is not available");
                 }
             }
         });
 
-        Button searchButton = new Button("Search");
+
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -182,13 +183,11 @@ public class CheckoutWindow extends Stage implements LibWindow {
         backBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
+                fields.forEach((key, value) -> value.setText(""));
                 Start.hideAllWindows();
                 Start.primStage().show();
             }
         });
-//        HBox hBack = new HBox(10);
-//        hBack.setAlignment(Pos.BOTTOM_LEFT);
-//        hBack.getChildren().add(backBtn);
         grid.add(backBtn, 0, 6);
         grid.add(addBtn, 1, 6);
         grid.add(checkoutBtn, 2, 6);

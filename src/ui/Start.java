@@ -98,18 +98,21 @@ public class Start extends Application {
             optionsMenu.getItems().addAll(login);
             mainMenu.getMenus().addAll(optionsMenu);
         } else {
+            optionsMenu.getItems().addAll(logout, bookIds, memberIds);
+            mainMenu.getMenus().addAll(optionsMenu);
             if (Auth.LIBRARIAN.equals(getUser().getAuthorization())) {
-                optionsMenu.getItems().addAll(logout, bookIds, memberIds);
+
             } else {
+                Menu adminMenu = new Menu("Admin");
+                MenuItem checkoutMenu = getCheckoutItem();
                 MenuItem memberAdd = getMemberAddItem();
 				MenuItem bookAdd = getBookAddItem(); // 0.5
                 MenuItem bookCopyAdd = getBookCopyAddItem();
-                optionsMenu.getItems().addAll(logout, bookIds, memberIds, memberAdd, bookAdd, bookCopyAdd);
-                mainMenu.getMenus().addAll(optionsMenu);
 
-                Menu checkoutMenu = new Menu("Checkout");
-                checkoutMenu.getItems().add(getCheckoutItem());
-                mainMenu.getMenus().addAll(checkoutMenu);
+                adminMenu.getItems().addAll(checkoutMenu, memberAdd, bookAdd, bookCopyAdd);
+                mainMenu.getMenus().addAll(adminMenu);
+//                checkoutMenu.getItems().add(getCheckoutItem());
+//                mainMenu.getMenus().addAll();
             }
         }
 
