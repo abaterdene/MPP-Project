@@ -1,4 +1,9 @@
 package dataaccess;
+
+import business.Book;
+import business.Checkout;
+import business.LibraryMember;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,13 +14,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
-import business.Author;
-import business.Book;
-import business.BookCopy;
-import business.Checkout;
-import business.LibraryMember;
-import dataaccess.DataAccessFacade.StorageType;
 
 
 public class DataAccessFacade implements DataAccess {
