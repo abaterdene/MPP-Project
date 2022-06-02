@@ -1,7 +1,7 @@
 package dataaccess;
 
+import business.Author;
 import business.Book;
-import business.Checkout;
 import business.LibraryMember;
 
 import java.io.IOException;
@@ -49,13 +49,6 @@ public class DataAccessFacade implements DataAccess {
         saveToStorage(StorageType.BOOKS, books);
     }
 
-    public void saveNewCheckout(Checkout checkout) {
-        HashMap<String, Checkout> checkouts = readCheckoutsMap();
-        int id = checkouts.size() + 1;
-        checkouts.put(String.valueOf(id), checkout);
-        saveToStorage(StorageType.CHECKOUTS, checkouts);
-    }
-
     @SuppressWarnings("unchecked")
     public HashMap<String, Book> readBooksMap() {
         //Returns a Map with name/value pairs being
@@ -64,15 +57,6 @@ public class DataAccessFacade implements DataAccess {
         if (Objects.isNull(books))
             books = new HashMap<>();
         return books;
-    }
-
-    public HashMap<String, Checkout> readCheckoutsMap() {
-        //Returns a Map with name/value pairs being
-        //   id -> Checkout
-        HashMap<String, Checkout> checkouts = (HashMap<String, Checkout>) readFromStorage(StorageType.CHECKOUTS);
-        if (Objects.isNull(checkouts))
-            checkouts = new HashMap<>();
-        return checkouts;
     }
 
     @SuppressWarnings("unchecked")
@@ -94,8 +78,16 @@ public class DataAccessFacade implements DataAccess {
         return (HashMap<String, User>) readFromStorage(StorageType.USERS);
     }
 
-	/////load methods - these place test data into the storage area
-	///// - used just once at startup  
+	@Override
+	public HashMap<String, Author> readAuthorMap() {
+		HashMap<String, Author> authors = new HashMap<>();
+		for(Book book: readBooksMap().values()) {
+			for(Author author: book.getAuthors()) {
+				authors.put(author.getFirstName() + " " + author.getLastName(), author);
+			}
+		}
+		return authors;
+	}
 	
 		
 	static void loadBookMap(List<Book> bookList) {
