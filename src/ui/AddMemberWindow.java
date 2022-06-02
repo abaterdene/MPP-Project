@@ -22,8 +22,6 @@ import java.util.HashMap;
 public class AddMemberWindow extends Stage implements LibWindow {
 	public static final AddMemberWindow INSTANCE = new AddMemberWindow();
 
-//	private HashMap<String, TextField> fields = new HashMap<>();
-
 	private boolean isInitialized = false;
 
 	public boolean isInitialized() {
@@ -36,7 +34,6 @@ public class AddMemberWindow extends Stage implements LibWindow {
 
 	private Text messageBar = new Text();
 	public void clear() {
-//		fields = new HashMap<>();
 		messageBar.setText("");
 	}
 

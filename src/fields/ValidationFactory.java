@@ -16,7 +16,7 @@ final public class ValidationFactory {
 
     public static Validation getValidation(String className) {
         if (!map.containsKey(className))
-            throw new IllegalArgumentException("No rule for this component");
+            throw new IllegalArgumentException("No validation for this component");
         return map.get(className);
     }
 }
