@@ -133,19 +133,6 @@ public class SystemController implements ControllerInterface {
 		DataAccess da = new DataAccessFacade();
 		Collection<LibraryMember> members = da.readMemberMap().values();
 		List<LibraryMember> mems = new ArrayList<>(members);
-
-		HashSet<LibraryMember> overdueMembers = new HashSet<>();
-		for(LibraryMember m : mems) {
-			Checkout[] checkouts = m.getCheckouts();
-			for(Checkout c: checkouts) {
-				CheckoutEntry[] entries = c.getEntries();
-				for(CheckoutEntry e: entries) {
-					if (Instant.now().isAfter(e.getDueDate())) {
-						overdueMembers.add(m);
-					}
-				}
-			}
-		}
-		return overdueMembers.stream().toList();
+		return mems.stream().filter(m -> m.getOverdueCheckouts().length > 0).collect(Collectors.toList());
 	}
 }

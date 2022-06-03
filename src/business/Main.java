@@ -34,19 +34,10 @@ public class Main {
 		DataAccess da = new DataAccessFacade();
 		Collection<LibraryMember> members = da.readMemberMap().values();
 		List<LibraryMember> mems = new ArrayList<>(members);
-		HashSet<String> overdueMembers = new HashSet<>();
-		for(LibraryMember m : mems) {
-			Checkout[] checkouts = m.getCheckouts();
-			for(Checkout c: checkouts) {
-				CheckoutEntry[] entries = c.getEntries();
-				for(CheckoutEntry e: entries) {
-					if (Instant.now().isAfter(e.getDueDate())) {
-						overdueMembers.add(m.getMemberId());
-					}
-				}
-			}
-		}
-		return overdueMembers.stream().toList();
+		return mems.stream()
+				.filter(m -> m.getOverdueCheckouts().length > 0)
+				.map(LibraryMember::getMemberId)
+				.collect(Collectors.toList());
 	}
 	
 	//Returns a list of all isbns of  Books that have multiple authors

@@ -1,6 +1,7 @@
 package business;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,18 @@ final public class LibraryMember extends Person implements Serializable {
 
 	public Checkout[] getCheckouts() {
 		return checkouts;
+	}
+
+	public Checkout[] getOverdueCheckouts() {
+		Checkout[] overdues = new Checkout[0];
+		for(Checkout c: checkouts) {
+			if (c.getOverDues().length > 0) {
+				Checkout[] newArr = new Checkout[overdues.length + 1];
+				System.arraycopy(overdues, 0, newArr, 0, overdues.length);
+				overdues = newArr;
+			}
+		}
+		return overdues;
 	}
 
 	@Override

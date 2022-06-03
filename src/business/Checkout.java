@@ -42,4 +42,17 @@ final public class Checkout implements Serializable {
 	public Instant getCheckoutDate() {
 		return checkoutDate;
 	}
+
+	public CheckoutEntry[] getOverDues() {
+//		return Arrays.stream(entries).filter(e -> e.getDueDate().isAfter(Instant.now()));
+		CheckoutEntry[] overdues = new CheckoutEntry[0];
+		for(CheckoutEntry e: entries) {
+			if (e.getDueDate().isBefore(Instant.now())) {
+				CheckoutEntry[] newArr = new CheckoutEntry[overdues.length + 1];
+				System.arraycopy(overdues, 0, newArr, 0, overdues.length);
+				overdues = newArr;
+			}
+		}
+		return overdues;
+	}
 }
