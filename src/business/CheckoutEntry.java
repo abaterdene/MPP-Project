@@ -11,12 +11,17 @@ import java.util.*;
 final public class CheckoutEntry implements Serializable {
 
     private static final long serialVersionUID = 6120690276685962829L;
-	private BookCopy bookCopy;
+    private BookCopy bookCopy;
     private Instant dueDate;
 
     public CheckoutEntry(BookCopy bookCopy) {
         this.bookCopy = bookCopy;
         setDueDate();
+    }
+
+    public CheckoutEntry(BookCopy bookCopy, Instant dueDate) {
+        this.bookCopy = bookCopy;
+        this.dueDate = dueDate;
     }
 
     public BookCopy getBookCopy() {

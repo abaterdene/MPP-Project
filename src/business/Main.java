@@ -3,6 +3,7 @@ package business;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import dataaccess.DataAccess;
@@ -33,14 +34,19 @@ public class Main {
 		DataAccess da = new DataAccessFacade();
 		Collection<LibraryMember> members = da.readMemberMap().values();
 		List<LibraryMember> mems = new ArrayList<>(members);
-		Instant comparingDate = Instant.now().minus(21, ChronoUnit.DAYS);
-		//implement
-		return mems.stream()
-				.filter(m -> m.getCheckouts().length > 0) // finding members who hava checkouts
-				.filter(m -> Arrays.stream(m.getCheckouts()).anyMatch(c -> c.getCheckoutDate().isBefore(comparingDate)))
-				.map(LibraryMember::getMemberId)
-				.collect(Collectors.toList());
-		
+		HashSet<String> overdueMembers = new HashSet<>();
+		for(LibraryMember m : mems) {
+			Checkout[] checkouts = m.getCheckouts();
+			for(Checkout c: checkouts) {
+				CheckoutEntry[] entries = c.getEntries();
+				for(CheckoutEntry e: entries) {
+					if (Instant.now().isAfter(e.getDueDate())) {
+						overdueMembers.add(m.getMemberId());
+					}
+				}
+			}
+		}
+		return overdueMembers.stream().toList();
 	}
 	
 	//Returns a list of all isbns of  Books that have multiple authors

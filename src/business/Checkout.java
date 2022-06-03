@@ -11,7 +11,6 @@ final public class Checkout implements Serializable {
 
 	private static final long serialVersionUID = 6130690276685962829L;
 	private CheckoutEntry[] entries;
-//	private LibraryMember member;
 	private Instant checkoutDate;
 
 	public void addEntry(BookCopy bookCopy) {
@@ -29,7 +28,6 @@ final public class Checkout implements Serializable {
 
 	public Checkout(CheckoutEntry[] entries) {
 		this.entries = entries;
-//		this.member = member;
 		this.checkoutDate = Instant.now();
 	}
 
@@ -44,12 +42,4 @@ final public class Checkout implements Serializable {
 	public Instant getCheckoutDate() {
 		return checkoutDate;
 	}
-
-//	public LibraryMember getMember() {
-//		return member;
-//	}
-//
-//	public void setMember(LibraryMember member) {
-//		this.member = member;
-//	}
 }
