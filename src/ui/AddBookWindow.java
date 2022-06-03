@@ -23,9 +23,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class AddBookWindow extends Stage implements LibWindow{
 
@@ -68,37 +66,45 @@ public class AddBookWindow extends Stage implements LibWindow{
         HashMap<String, TextField> fields = new HashMap<>();
         addField(grid, new IsbnField(), "ISBN", fields);
         addField(grid, new TField(), "Title", fields);
-        addField(grid, new NumberField(), "Maximum Checkout length", fields);
         addField(grid, new NumberField(), "Number of copies", fields);
 
-        List<String> selectedAuthors = new ArrayList<>();
-        Label selectedLabel = new Label("");
-        ComboBox comboBox = new ComboBox(FXCollections
-                .observableArrayList(ci.allAuthorIds()));
 
-        comboBox.setOnAction( new EventHandler<ActionEvent>() {
+        Label checkoutLbl = new Label( "Maximum Checkout length:");
+        grid.add(checkoutLbl, 0, fields.size() + 1);
+        String [] checkoutLength = {"7", "21"};
+        ComboBox checkoutCbx = new ComboBox(FXCollections
+                .observableArrayList(checkoutLength));
+        checkoutCbx.getSelectionModel().selectFirst();
+        grid.add(checkoutCbx, 1, fields.size() + 1);
+
+        Set<String> selectedAuthors = new HashSet<>();
+        Label selectedLabel = new Label("");
+        ComboBox authorCbx = new ComboBox(FXCollections
+                .observableArrayList(ci.allAuthorIds()));
+//        comboBox.setValue("Add Author(s)");
+        authorCbx.setOnAction( new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e)
             {
-                selectedLabel.setText(comboBox.getValue() + " added");
-                selectedAuthors.add(comboBox.getValue().toString());
+                selectedLabel.setText(authorCbx.getValue() + " added");
+                selectedAuthors.add(authorCbx.getValue().toString());
             }
         });
 
         Label authorLabel = new Label("Authors: ");
-        grid.add(authorLabel, 0, 5);
-        grid.add(comboBox, 1, 5);
-        grid.add(selectedLabel, 1, 6);
+        grid.add(authorLabel, 0, fields.size() + 2);
+        grid.add(authorCbx, 1, fields.size() + 2);
+        grid.add(selectedLabel, 1, fields.size() + 3);
 
         HBox messageBox = new HBox(10);
         messageBox.setAlignment(Pos.BOTTOM_RIGHT);
         messageBox.getChildren().add(messageBar);
-        grid.add(messageBox, 1, fields.size() + 3);
+        grid.add(messageBox, 1, fields.size() + 4);
 
         Button addButton = new Button("Add book");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(addButton);
-        grid.add(hbBtn, 1, fields.size() + 4);
+        grid.add(hbBtn, 1, fields.size() + 5);
 
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -123,14 +129,19 @@ public class AddBookWindow extends Stage implements LibWindow{
                         messageBar.setText("Book author is not selected");
                     } else {
                         Integer numberOfCopies = Integer.parseInt(fields.get("number of copies").getText());
-                        Integer maxCheckoutLength = Integer.parseInt(fields.get("maximum checkout length").getText());
+                        if(numberOfCopies < 0) {
+                            messageBar.setText("Number of copies cannot be negative number");
+                        }
+                        Integer maxCheckoutLength = Integer.parseInt(checkoutCbx.getValue().toString());
                         ArrayList<Author> authors = new ArrayList<>();
                         for(String authorId: selectedAuthors) {
                             authors.add(ci.getAuthorById(authorId));
                         }
                         book = new Book(fields.get("isbn").getText(), fields.get("title").getText(), maxCheckoutLength, authors);
+                        for (int i = 1; i < numberOfCopies; i++) {
+                            book.addCopy();
+                        }
                         ci.addBook(book);
-                        ci.addBookCopy(book, numberOfCopies);
                         //add book copy
                         Start.hideAllWindows();
                         Start.primStage().show();
@@ -153,7 +164,7 @@ public class AddBookWindow extends Stage implements LibWindow{
         HBox hBack = new HBox(10);
         hBack.setAlignment(Pos.BOTTOM_LEFT);
         hBack.getChildren().add(backBtn);
-        grid.add(hBack, 0, fields.size() + 4);
+        grid.add(hBack, 0, fields.size() + 5);
         Scene scene = new Scene(grid);
         scene.getStylesheets().add(getClass().getResource("library.css").toExternalForm());
         setScene(scene);
