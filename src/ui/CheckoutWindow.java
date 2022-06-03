@@ -157,8 +157,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
                 if (Objects.nonNull(book)) {
                     try {
                         BookCopy copy = book.getNextAvailableCopy();
-                        copy.changeAvailability();
-                        copy.getBook().updateCopies(copy);
                         checkout.addEntry(copy);
                         setCart();
                         setTable();
@@ -179,9 +177,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         removeBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                BookCopy copy = checkout.getEntries()[checkout.getEntries().length - 1].getBookCopy();
-                copy.changeAvailability();
-                copy.getBook().updateCopies(copy);
                 checkout.removeLastEntry();
                 setCart();
                 setTable();
@@ -210,9 +205,12 @@ public class CheckoutWindow extends Stage implements LibWindow {
                 try {
                     SystemController ci = new SystemController();
                     for (CheckoutEntry entry : checkout.getEntries()) {
-                        ci.addBook(entry.getBookCopy().getBook());
+                        BookCopy copy = entry.getBookCopy();
+                        copy.changeAvailability(); // change book as unavailable
+                        copy.getBook().updateCopies(copy); // update the book instance
+                        ci.addBook(copy.getBook()); // persist the data
                     }
-                    member.addCheckout(checkout);
+                    member.addCheckout(checkout); // change member checkout list
                     ci.checkoutBook(member); // save member updated
                     messageBar.setText("Book is checked out"); // show message
                     checkout = new Checkout(new CheckoutEntry[0]);
