@@ -1,5 +1,7 @@
 package business;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,9 +33,11 @@ public class Main {
 		DataAccess da = new DataAccessFacade();
 		Collection<LibraryMember> members = da.readMemberMap().values();
 		List<LibraryMember> mems = new ArrayList<>(members);
+		Instant comparingDate = Instant.now().minus(21, ChronoUnit.DAYS);
 		//implement
 		return mems.stream()
-				.filter(m -> m.getCheckouts().length > 0)
+				.filter(m -> m.getCheckouts().length > 0) // finding members who hava checkouts
+				.filter(m -> Arrays.stream(m.getCheckouts()).anyMatch(c -> c.getCheckoutDate().isBefore(comparingDate)))
 				.map(LibraryMember::getMemberId)
 				.collect(Collectors.toList());
 		
