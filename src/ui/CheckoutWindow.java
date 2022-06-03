@@ -44,14 +44,27 @@ public class CheckoutWindow extends Stage implements LibWindow {
 
     private Book book;
     private LibraryMember member;
-    private Checkout checkout = new Checkout( new CheckoutEntry[0]);
+    private Checkout checkout = new Checkout(new CheckoutEntry[0]);
 
-    public void setTable(String data) {
-        ta.setText(data);
+    public void setTable() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Title\tAvailable\tCopy Number\n");
+        Arrays.stream(book.getCopies())
+                .filter(c -> Boolean.TRUE.equals(c.isAvailable()))
+                .filter(c -> !Arrays.stream(checkout.getEntries()).anyMatch(e -> e.getBookCopy().equals(c)))
+                .forEach(b -> {
+                    sb.append(b.getBook().getTitle() + "\t" + b.getBook().isAvailable() + "\t" + b.getCopyNum() + "\n");
+                });
+        ta.setText(sb.toString());
     }
 
-    public void setCart(String data) {
-        cart.setText(data);
+    public void setCart() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Title\tCopy Number\n");
+        for (CheckoutEntry c : checkout.getEntries()) {
+            sb.append(c.getBookCopy().getBook().getTitle() + "\t" + c.getBookCopy().getCopyNum() + "\n");
+        }
+        cart.setText(sb.toString());
     }
 
     /* This class is a singleton */
@@ -61,8 +74,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         cart.setText("");
         this.checkout = new Checkout(new CheckoutEntry[0]);
     }
-
-    ;
 
     private CheckoutWindow() {
     }
@@ -75,21 +86,71 @@ public class CheckoutWindow extends Stage implements LibWindow {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        HBox memberBox = new HBox(0);
+        Text scenetitle = new Text("All the book copies");
+        scenetitle.setFont(Font.font("Harlow Solid Italic", FontWeight.NORMAL, 20)); //Tahoma
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        HBox memberBox = new HBox(10);
         memberBox.setAlignment(Pos.CENTER_LEFT);
-        HBox bookBox = new HBox(0);
+        HBox bookBox = new HBox(10);
         bookBox.setAlignment(Pos.CENTER);
-        HBox buttonBox = new HBox(0);
+        HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
+        HBox checkoutBox = new HBox(10);
+        checkoutBox.setAlignment(Pos.CENTER_RIGHT);
 
         HashMap<String, TextField> fields = new HashMap<>();
         addField(memberBox, new TField(), "MemberID", fields);
-        grid.add(memberBox, 0, 1);
         addField(bookBox, new TField(), "ISBN", fields);
-        grid.add(bookBox, 1, 1);
 
-        Button searchButton = new Button("Search");
-        Button addBtn = new Button("Add book");
+        Button searchBtn = getSearchBtn(fields);
+        buttonBox.getChildren().add(searchBtn);
+        checkoutBox.getChildren().add(getCheckoutBtn(searchBtn));
+
+        HBox firstRow = new HBox(10);
+        firstRow.getChildren().addAll(memberBox, bookBox, buttonBox, checkoutBox);
+        grid.add(new VBox(firstRow), 0,2);
+
+        VBox messageBox = new VBox();
+        messageBox.getChildren().add(messageBar);
+        grid.add(messageBox, 0, 3);
+
+        HBox actionBox = new HBox(10);
+        actionBox.setAlignment(Pos.CENTER);
+        VBox actions = new VBox(10);
+        actions.getChildren().addAll(getAddBtn(), getRemoveBtn());
+        actionBox.getChildren().add(actions);
+
+        HBox taBox = new HBox(10);
+        taBox.setAlignment(Pos.CENTER_LEFT);
+        ta = new TextArea();
+        taBox.getChildren().add(ta);
+
+        HBox cartBox = new HBox(10);
+        cartBox.setAlignment(Pos.CENTER_RIGHT);
+        cart = new TextArea();
+        cartBox.getChildren().add(cart);
+
+        HBox thirdRow = new HBox(10);
+        thirdRow.getChildren().addAll(taBox, actionBox, cartBox);
+        grid.add(thirdRow, 0, 4);
+        // back button
+        grid.add(getBackBtn(fields), 0 ,5);
+        Scene scene = new Scene(grid);
+        scene.getStylesheets().add(getClass().getResource("library.css").toExternalForm());
+        setScene(scene);
+        isInitialized(true);
+    }
+
+    private void addField(HBox grid, TextField field, String text, HashMap<String, TextField> fields) {
+        Label label = new Label(text + ": ");
+        grid.getChildren().add(label);
+        grid.getChildren().add(field);
+        fields.put(text.toLowerCase(), field);
+    }
+
+    private Button getAddBtn() {
+        Button addBtn = new Button(">");
         addBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -99,13 +160,8 @@ public class CheckoutWindow extends Stage implements LibWindow {
                         copy.changeAvailability();
                         copy.getBook().updateCopies(copy);
                         checkout.addEntry(copy);
-                        System.out.println(checkout.getEntries().length);
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Title\tCopy Number\n");
-                        for (CheckoutEntry c : checkout.getEntries()) {
-                            sb.append(c.getBookCopy().getBook().getTitle() +  "\t" + c.getBookCopy().getCopyNum()  +  "\n");
-                        }
-                        setCart(sb.toString());
+                        setCart();
+                        setTable();
                     } catch (NullPointerException exception) {
                         messageBar.setText("Book copy is not available");
                     }
@@ -114,7 +170,39 @@ public class CheckoutWindow extends Stage implements LibWindow {
                 }
             }
         });
+        return addBtn;
+    }
 
+
+    private Button getRemoveBtn() {
+        Button removeBtn = new Button("<");
+        removeBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                BookCopy copy = checkout.getEntries()[checkout.getEntries().length - 1].getBookCopy();
+                copy.changeAvailability();
+                copy.getBook().updateCopies(copy);
+                checkout.removeLastEntry();
+                setCart();
+                setTable();
+            }
+        });
+        return removeBtn;
+    }
+    private Button getBackBtn(HashMap<String, TextField> fields) {
+        Button backBtn = new Button("Back to Main");
+        backBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                fields.forEach((key, value) -> value.setText(""));
+                Start.hideAllWindows();
+                Start.primStage().show();
+            }
+        });
+        return backBtn;
+    }
+
+    private Button getCheckoutBtn(Button searchBtn) {
         Button checkoutBtn = new Button("Checkout");
         checkoutBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -127,17 +215,20 @@ public class CheckoutWindow extends Stage implements LibWindow {
                     member.addCheckout(checkout);
                     ci.checkoutBook(member); // save member updated
                     messageBar.setText("Book is checked out"); // show message
-                    setCart(""); // empty the cart
                     checkout = new Checkout(new CheckoutEntry[0]);
-                    searchButton.fire();
+                    setCart(); // empty the cart
+                    searchBtn.fire();
                 } catch (NullPointerException exception) {
                     messageBar.setText("Book copy is not available");
                 }
             }
         });
+        return checkoutBtn;
+    }
 
-
-        searchButton.setOnAction(new EventHandler<ActionEvent>() {
+    private Button getSearchBtn(HashMap<String, TextField> fields) {
+        Button searchBtn = new Button("Search");
+        searchBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 // search
@@ -149,58 +240,12 @@ public class CheckoutWindow extends Stage implements LibWindow {
                     member = ci.getMemberById(fields.get("memberid").getText());
                     messageBar.setText(member.getMemberId() + "\t" + member.getFirstName());
                     book = ci.getRentableBookByIsbn(fields.get("isbn").getText());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Title\tAvailable\tCopy Number\n");
-//                    for (BookCopy b : book.getCopies()) {
-//                        sb.append(b.getBook().getTitle() +  "\t" + b.getBook().isAvailable()  + "\t"  + b.getCopyNum() + "\n");
-//                    }
-                    Arrays.stream(book.getCopies())
-                            .filter(c -> Boolean.TRUE.equals(c.isAvailable()))
-                            .forEach(b -> {
-                                sb.append(b.getBook().getTitle() +  "\t" + b.getBook().isAvailable()  + "\t"  + b.getCopyNum() + "\n");
-                            });
-                    setTable(sb.toString());
-
+                    setTable();
                 } catch (LibrarySystemException | InvalidFieldException exception) {
                     messageBar.setText(exception.getMessage());
                 }
             }
         });
-        buttonBox.getChildren().add(searchButton);
-        grid.add(buttonBox, 3, 1);
-
-
-        Text scenetitle = new Text("All the book copies");
-        scenetitle.setFont(Font.font("Harlow Solid Italic", FontWeight.NORMAL, 20)); //Tahoma
-        grid.add(scenetitle, 0, 0, 2, 1);
-
-        grid.add(messageBar, 0, 4);
-        ta = new TextArea();
-        grid.add(ta, 0,5);
-        cart = new TextArea();
-        grid.add(cart, 1,5);
-        Button backBtn = new Button("Back to Main");
-        backBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                fields.forEach((key, value) -> value.setText(""));
-                Start.hideAllWindows();
-                Start.primStage().show();
-            }
-        });
-        grid.add(backBtn, 0, 6);
-        grid.add(addBtn, 1, 6);
-        grid.add(checkoutBtn, 2, 6);
-        Scene scene = new Scene(grid);
-        scene.getStylesheets().add(getClass().getResource("library.css").toExternalForm());
-        setScene(scene);
-        isInitialized(true);
-    }
-
-    private void addField(HBox grid, TextField field, String text, HashMap<String, TextField> fields) {
-        Label label = new Label(text + ": ");
-        grid.getChildren().add(label);
-        grid.getChildren().add(field);
-        fields.put(text.toLowerCase(), field);
+        return searchBtn;
     }
 }

@@ -21,6 +21,12 @@ final public class Checkout implements Serializable {
 		entries = newArr;
 	}
 
+	public void removeLastEntry() {
+		CheckoutEntry[] newArr = new CheckoutEntry[entries.length - 1];
+		System.arraycopy(entries, 0, newArr, 0, entries.length - 1);
+		entries = newArr;
+	}
+
 	public Checkout(CheckoutEntry[] entries) {
 		this.entries = entries;
 //		this.member = member;
