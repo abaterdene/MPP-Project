@@ -1,10 +1,10 @@
 package business;
 
 import java.lang.reflect.Member;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import dataaccess.Auth;
 import dataaccess.DataAccess;
@@ -126,5 +126,18 @@ public class SystemController implements ControllerInterface {
 	public void checkoutBook(LibraryMember member) {
 		DataAccess da = new DataAccessFacade();
 		da.saveNewMember(member);
+	}
+
+	@Override
+	public List<LibraryMember> allOverdueMembers() {
+		DataAccess da = new DataAccessFacade();
+		Collection<LibraryMember> members = da.readMemberMap().values();
+		List<LibraryMember> mems = new ArrayList<>(members);
+		Instant comparingDate = Instant.now().minus(21, ChronoUnit.DAYS);
+		//implement
+		return mems.stream()
+				.filter(m -> m.getCheckouts().length > 0) // finding members who hava checkouts
+				.filter(m -> Arrays.stream(m.getCheckouts()).anyMatch(c -> c.getCheckoutDate().isBefore(comparingDate)))
+				.collect(Collectors.toList());
 	}
 }

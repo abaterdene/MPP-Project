@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import business.ControllerInterface;
+import business.LibraryMember;
 import business.SystemController;
 import dataaccess.Auth;
 import dataaccess.User;
@@ -49,7 +50,8 @@ public class Start extends Application {
             AddMemberWindow.INSTANCE,
             CheckoutWindow.INSTANCE,
             AddBookCopyWindow.INSTANCE,
-            AddBookWindow.INSTANCE
+            AddBookWindow.INSTANCE,
+            OverdueMembersWindow.INSTANCE
     };
 
     public static void hideAllWindows() {
@@ -104,7 +106,8 @@ public class Start extends Application {
                     Auth.BOTH.equals(getUser().getAuthorization())) {
                 Menu libMenu = new Menu("Librarian");
                 MenuItem checkoutMenu = getCheckoutItem();
-                libMenu.getItems().add(checkoutMenu);
+                MenuItem overdueMenu = getOverdueItem();
+                libMenu.getItems().addAll(checkoutMenu, overdueMenu);
                 mainMenu.getMenus().addAll(libMenu);
             }
             if (Auth.ADMIN.equals(getUser().getAuthorization()) ||
@@ -186,6 +189,35 @@ public class Start extends Application {
             }
         });
         return logout;
+    }
+
+    private static MenuItem getOverdueItem() {
+        MenuItem overdueMembers = new MenuItem("Overdue members");
+        overdueMembers.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                hideAllWindows();
+                if (!OverdueMembersWindow.INSTANCE.isInitialized()) {
+                    OverdueMembersWindow.INSTANCE.init();
+                }
+                ControllerInterface ci = new SystemController();
+                List<LibraryMember> members = ci.allOverdueMembers();
+                StringBuilder sb = new StringBuilder();
+                if (members.size() == 0)
+                    sb.append("There is no overdue members");
+                for (LibraryMember m : members) {
+                    sb.append(m.getMemberId())
+                            .append("\t")
+                            .append(m.getFirstName())
+                            .append("\t")
+                            .append(m.getLastName())
+                            .append("\n");
+                }
+                OverdueMembersWindow.INSTANCE.setData(sb.toString());
+                OverdueMembersWindow.INSTANCE.show();
+            }
+        });
+        return overdueMembers;
     }
 
     private static MenuItem getBooksIdsItem() {
