@@ -259,12 +259,10 @@ public class Start extends Application {
                 ControllerInterface ci = new SystemController();
                 List<String> ids = ci.allMemberIds();
                 Collections.sort(ids);
-                System.out.println(ids);
                 StringBuilder sb = new StringBuilder();
                 for (String s : ids) {
                     sb.append(s).append("\n");
                 }
-                System.out.println(sb.toString());
                 AllMembersWindow.INSTANCE.setData(sb.toString());
                 AllMembersWindow.INSTANCE.show();
             }

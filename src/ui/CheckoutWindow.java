@@ -114,10 +114,10 @@ public class CheckoutWindow extends Stage implements LibWindow {
 
         Button searchBtn = getSearchBtn(fields);
         buttonBox.getChildren().add(searchBtn);
-        checkoutBox.getChildren().add(getCheckoutBtn(searchBtn));
+        checkoutBox.getChildren().add(getCheckoutBtn(searchBtn, fields));
 
         HBox firstRow = new HBox(10);
-        firstRow.getChildren().addAll(memberBox, bookBox, buttonBox, checkoutBox);
+        firstRow.getChildren().addAll(bookBox, buttonBox, memberBox, checkoutBox);
         grid.add(new VBox(firstRow), 0, 2);
 
         VBox messageBox = new VBox();
@@ -209,27 +209,37 @@ public class CheckoutWindow extends Stage implements LibWindow {
         return backBtn;
     }
 
-    private Button getCheckoutBtn(Button searchBtn) {
+    private Button getCheckoutBtn(Button searchBtn, HashMap<String, TextField> fields) {
         Button checkoutBtn = new Button("Checkout");
         checkoutBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 try {
-                    SystemController ci = new SystemController();
-                    for (CheckoutEntry entry : checkout.getEntries()) {
-                        BookCopy copy = entry.getBookCopy();
-                        copy.changeAvailability(); // change book as unavailable
-                        copy.getBook().updateCopies(copy); // update the book instance
-                        ci.addBook(copy.getBook()); // persist the data
+                    ValidationFactory.getValidation(fields.get("memberid").getClass().getSimpleName())
+                            .validate(fields.get("memberid").getText());
+                    if (checkout.getEntries().length > 0) {
+                        SystemController ci = new SystemController();
+                        member = ci.getMemberById(fields.get("memberid").getText());
+                        for (CheckoutEntry entry : checkout.getEntries()) {
+                            BookCopy copy = entry.getBookCopy();
+                            copy.changeAvailability(); // change book as unavailable
+                            copy.getBook().updateCopies(copy); // update the book instance
+                            ci.addBook(copy.getBook()); // persist the data
+                        }
+                        member.addCheckout(checkout); // change member checkout list
+                        ci.checkoutBook(member); // save member updated
+                        messageBar.setText("Book is checked out"); // show message
+                        checkout = new Checkout(new CheckoutEntry[0]);
+                        fields.get("memberid").setText("");
+                        setCart(); // empty the cart
+                        searchBtn.fire();
+                    } else {
+                        messageBar.setText("Select the books to checking out");
                     }
-                    member.addCheckout(checkout); // change member checkout list
-                    ci.checkoutBook(member); // save member updated
-                    messageBar.setText("Book is checked out"); // show message
-                    checkout = new Checkout(new CheckoutEntry[0]);
-                    setCart(); // empty the cart
-                    searchBtn.fire();
                 } catch (NullPointerException exception) {
                     messageBar.setText("Book copy is not available");
+                } catch (InvalidFieldException | LibrarySystemException exception) {
+                    messageBar.setText(exception.getMessage());
                 }
             }
         });
@@ -244,11 +254,9 @@ public class CheckoutWindow extends Stage implements LibWindow {
                 // search
                 messageBar.setText("");
                 try {
-                    fields.forEach((key, value) -> ValidationFactory.getValidation(value.getClass().getSimpleName())
-                            .validate(value.getText()));
+                    ValidationFactory.getValidation(fields.get("isbn").getClass().getSimpleName())
+                            .validate(fields.get("isbn").getText());
                     SystemController ci = new SystemController();
-                    member = ci.getMemberById(fields.get("memberid").getText());
-                    messageBar.setText(member.getMemberId() + "\t" + member.getFirstName());
                     book = ci.getRentableBookByIsbn(fields.get("isbn").getText());
                     setTable();
                 } catch (LibrarySystemException | InvalidFieldException exception) {
