@@ -21,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,15 +47,31 @@ public class PrintCheckoutsWindow extends Stage implements LibWindow {
     private List<Checkout> checkouts;
     private TextArea ta;
     public void setTable() {
+        ta.setText(getPrintText());
+    }
+
+    public String getPrintText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Checkout Date\tNumber of entries\n");
-        checkouts.forEach(c -> {
-            sb.append(c.getCheckoutDate())
-                    .append("\t")
-                    .append(c.getEntries().length)
-                    .append("\n");
-        });
-        ta.setText(sb.toString());
+        sb.append("ISBN\tTitle\tCopy number\tCheckout Date\tDue Date\n");
+        for (Checkout c : checkouts) {
+            for (CheckoutEntry e : c.getEntries()) {
+                sb.append(e.getBookCopy().getBook().getIsbn())
+                        .append("\t")
+                        .append(e.getBookCopy().getBook().getTitle())
+                        .append("\t")
+                        .append(e.getBookCopy().getCopyNum())
+                        .append("\t")
+                        .append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                                .withZone(ZoneId.of("UTC"))
+                                .format(c.getCheckoutDate()))
+                        .append("\t")
+                        .append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                                .withZone(ZoneId.of("UTC"))
+                                .format(e.getDueDate()))
+                        .append("\n");
+            }
+        }
+        return sb.toString();
     }
 
     /* This class is a singleton */
@@ -141,6 +158,7 @@ public class PrintCheckoutsWindow extends Stage implements LibWindow {
         checkoutBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
+                System.out.println(getPrintText());
             }
         });
         return checkoutBtn;
