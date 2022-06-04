@@ -135,4 +135,13 @@ public class SystemController implements ControllerInterface {
 		List<LibraryMember> mems = new ArrayList<>(members);
 		return mems.stream().filter(m -> m.getOverdueCheckouts().length > 0).collect(Collectors.toList());
 	}
+
+	@Override
+	public List<Checkout> checkoutsByMemberId(String memberId) {
+		DataAccess da = new DataAccessFacade();
+		List<Checkout> checkouts = new ArrayList<>();
+		Collection<LibraryMember> members = da.readMemberMap().values();
+		members.forEach(m -> checkouts.addAll(Arrays.stream(m.getCheckouts()).toList()));
+		return checkouts;
+	}
 }

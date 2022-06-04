@@ -51,7 +51,8 @@ public class Start extends Application {
             CheckoutWindow.INSTANCE,
             AddBookCopyWindow.INSTANCE,
             AddBookWindow.INSTANCE,
-            OverdueMembersWindow.INSTANCE
+            OverdueMembersWindow.INSTANCE,
+            PrintCheckoutsWindow.INSTANCE
     };
 
     public static void hideAllWindows() {
@@ -107,7 +108,8 @@ public class Start extends Application {
                 Menu libMenu = new Menu("Librarian");
                 MenuItem checkoutMenu = getCheckoutItem();
                 MenuItem overdueMenu = getOverdueItem();
-                libMenu.getItems().addAll(checkoutMenu, overdueMenu);
+                MenuItem printMenu = getPrintPageItem();
+                libMenu.getItems().addAll(checkoutMenu, overdueMenu, printMenu);
                 mainMenu.getMenus().addAll(libMenu);
             }
             if (Auth.ADMIN.equals(getUser().getAuthorization()) ||
@@ -314,5 +316,21 @@ public class Start extends Application {
             }
         });
         return bookCopyAdd;
+    }
+
+    private static MenuItem getPrintPageItem() {
+        MenuItem printCheckouts = new MenuItem("Print checkouts");
+        printCheckouts.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                hideAllWindows();
+                if (!PrintCheckoutsWindow.INSTANCE.isInitialized()) {
+                    PrintCheckoutsWindow.INSTANCE.init();
+                }
+                PrintCheckoutsWindow.INSTANCE.clear();
+                PrintCheckoutsWindow.INSTANCE.show();
+            }
+        });
+        return printCheckouts;
     }
 }

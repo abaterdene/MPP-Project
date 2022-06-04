@@ -21,4 +21,6 @@ public interface ControllerInterface {
 	public Book getRentableBookByIsbn(String isbn) throws LibrarySystemException;
 	public Author getAuthorById(String authorId) throws LibrarySystemException;
 	public void checkoutBook(LibraryMember member);
+
+	public List<Checkout> checkoutsByMemberId(String memberId);
 }
