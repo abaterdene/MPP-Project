@@ -115,7 +115,7 @@ public class SystemController implements ControllerInterface {
 	public void addBookCopy(Book book, int numberOfCopies){
 		DataAccess da = new DataAccessFacade();
 		if (!currentUser.getAuthorization().equals(Auth.LIBRARIAN)) {
-			for (int i = 1; i < numberOfCopies; i++) {
+			for (int i = 1; i <= numberOfCopies; i++) {
 				book.addCopy();
 			}
 			da.saveNewBook(book);

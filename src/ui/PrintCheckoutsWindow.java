@@ -53,6 +53,8 @@ public class PrintCheckoutsWindow extends Stage implements LibWindow {
     public String getPrintText() {
         StringBuilder sb = new StringBuilder();
         sb.append("ISBN\tTitle\tCopy number\tCheckout Date\tDue Date\n");
+        if (checkouts.size() == 0)
+            messageBar.setText("Not found");
         for (Checkout c : checkouts) {
             for (CheckoutEntry e : c.getEntries()) {
                 sb.append(e.getBookCopy().getBook().getIsbn())
