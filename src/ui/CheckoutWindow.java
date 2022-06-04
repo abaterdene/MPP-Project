@@ -51,10 +51,13 @@ public class CheckoutWindow extends Stage implements LibWindow {
         sb.append("Title\tAvailable\tCopy Number\n");
         Arrays.stream(book.getCopies())
                 .filter(c -> Boolean.TRUE.equals(c.isAvailable()))
-                .filter(c -> !Arrays.stream(checkout.getEntries()).anyMatch(e -> e.getBookCopy().equals(c)))
-                .forEach(b -> {
-                    sb.append(b.getBook().getTitle() + "\t" + b.getBook().isAvailable() + "\t" + b.getCopyNum() + "\n");
-                });
+                .filter(c -> Arrays.stream(checkout.getEntries()).noneMatch(e -> e.getBookCopy().equals(c)))
+                .forEach(b -> sb.append(b.getBook().getTitle())
+                        .append("\t")
+                        .append(b.getBook().isAvailable())
+                        .append("\t")
+                        .append(b.getCopyNum())
+                        .append("\n"));
         ta.setText(sb.toString());
     }
 
@@ -62,7 +65,10 @@ public class CheckoutWindow extends Stage implements LibWindow {
         StringBuilder sb = new StringBuilder();
         sb.append("Title\tCopy Number\n");
         for (CheckoutEntry c : checkout.getEntries()) {
-            sb.append(c.getBookCopy().getBook().getTitle() + "\t" + c.getBookCopy().getCopyNum() + "\n");
+            sb.append(c.getBookCopy().getBook().getTitle())
+                    .append("\t")
+                    .append(c.getBookCopy().getCopyNum())
+                    .append("\n");
         }
         cart.setText(sb.toString());
     }
