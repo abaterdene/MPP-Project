@@ -48,9 +48,11 @@ public class OverdueBooksWindow extends Stage implements LibWindow {
     }
 
     public String getPrintText() {
+        messageBar.setText("");
         StringBuilder sb = new StringBuilder();
         sb.append("ISBN\tTitle\tCopy number\tMember ID\n");
-
+        if (overdueBooks.size() == 0)
+            messageBar.setText("Not found");
         overdueBooks.forEach(item -> {
             BookCopy copy = (BookCopy) item.get("copy");
             LibraryMember member = (LibraryMember) item.get("member");
@@ -70,6 +72,9 @@ public class OverdueBooksWindow extends Stage implements LibWindow {
 
     public void clear() {
         messageBar.setText("");
+        ta.setText("");
+        overdueMembers = new ArrayList<>();
+        overdueBooks = new ArrayList<>();
     }
 
     private OverdueBooksWindow() {
