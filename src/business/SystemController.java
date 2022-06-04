@@ -139,9 +139,7 @@ public class SystemController implements ControllerInterface {
 	@Override
 	public List<Checkout> checkoutsByMemberId(String memberId) {
 		DataAccess da = new DataAccessFacade();
-		List<Checkout> checkouts = new ArrayList<>();
-		Collection<LibraryMember> members = da.readMemberMap().values();
-		members.forEach(m -> checkouts.addAll(Arrays.stream(m.getCheckouts()).toList()));
-		return checkouts;
+		LibraryMember member = da.readMemberMap().get(memberId);
+		return Arrays.stream(member.getCheckouts()).toList();
 	}
 }

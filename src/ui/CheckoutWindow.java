@@ -71,7 +71,10 @@ public class CheckoutWindow extends Stage implements LibWindow {
 
     public void clear() {
         messageBar.setText("");
+        ta.setText("");
         cart.setText("");
+        book = null;
+        member = null;
         this.checkout = new Checkout(new CheckoutEntry[0]);
     }
 
@@ -109,7 +112,7 @@ public class CheckoutWindow extends Stage implements LibWindow {
 
         HBox firstRow = new HBox(10);
         firstRow.getChildren().addAll(memberBox, bookBox, buttonBox, checkoutBox);
-        grid.add(new VBox(firstRow), 0,2);
+        grid.add(new VBox(firstRow), 0, 2);
 
         VBox messageBox = new VBox();
         messageBox.getChildren().add(messageBar);
@@ -135,7 +138,7 @@ public class CheckoutWindow extends Stage implements LibWindow {
         thirdRow.getChildren().addAll(taBox, actionBox, cartBox);
         grid.add(thirdRow, 0, 4);
         // back button
-        grid.add(getBackBtn(fields), 0 ,5);
+        grid.add(getBackBtn(fields), 0, 5);
         Scene scene = new Scene(grid);
         scene.getStylesheets().add(getClass().getResource("library.css").toExternalForm());
         setScene(scene);
@@ -177,13 +180,16 @@ public class CheckoutWindow extends Stage implements LibWindow {
         removeBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                checkout.removeLastEntry();
-                setCart();
-                setTable();
+                if (Objects.nonNull(checkout) && checkout.getEntries().length > 0) {
+                    checkout.removeLastEntry();
+                    setCart();
+                    setTable();
+                }
             }
         });
         return removeBtn;
     }
+
     private Button getBackBtn(HashMap<String, TextField> fields) {
         Button backBtn = new Button("Back to Main");
         backBtn.setOnAction(new EventHandler<ActionEvent>() {
