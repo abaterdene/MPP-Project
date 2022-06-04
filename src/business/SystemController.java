@@ -140,6 +140,6 @@ public class SystemController implements ControllerInterface {
 	public List<Checkout> checkoutsByMemberId(String memberId) {
 		DataAccess da = new DataAccessFacade();
 		LibraryMember member = da.readMemberMap().get(memberId);
-		return Arrays.stream(member.getCheckouts()).toList();
+		return Objects.nonNull(member) ? Arrays.stream(member.getCheckouts()).toList() : new ArrayList<>();
 	}
 }
