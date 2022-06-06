@@ -157,7 +157,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         grid.getChildren().add(field);
         fields.put(text.toLowerCase(), field);
     }
-
     private Button getAddBtn() {
         Button addBtn = new Button(">");
         addBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -179,8 +178,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         });
         return addBtn;
     }
-
-
     private Button getRemoveBtn() {
         Button removeBtn = new Button("<");
         removeBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -195,7 +192,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         });
         return removeBtn;
     }
-
     private Button getBackBtn(HashMap<String, TextField> fields) {
         Button backBtn = new Button("Back to Main");
         backBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -208,7 +204,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         });
         return backBtn;
     }
-
     private Button getCheckoutBtn(Button searchBtn, HashMap<String, TextField> fields) {
         Button checkoutBtn = new Button("Checkout");
         checkoutBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -245,7 +240,6 @@ public class CheckoutWindow extends Stage implements LibWindow {
         });
         return checkoutBtn;
     }
-
     private Button getSearchBtn(HashMap<String, TextField> fields) {
         Button searchBtn = new Button("Search");
         searchBtn.setOnAction(new EventHandler<ActionEvent>() {
